@@ -101,9 +101,9 @@ static void TMAccessCallback(SCNetworkReachabilityRef target, SCNetworkReachabil
     
     if (ref)
     {
-        Reachability *obj = [[self alloc] initWithReachabilityRef:ref];
+        Access *obj = [[self alloc] initWithAccessRef:ref];
         
-        hasConnection = obj.isReachable;
+        hasConnection = obj.isAccessable;
         
         CFRelease(ref);
     }
@@ -172,7 +172,7 @@ static void TMAccessCallback(SCNetworkReachabilityRef target, SCNetworkReachabil
     self = [super init];
     if (self != nil) 
     {
-        self.reachableOnWWAN = YES;
+        self.accessableOnWWAN = YES;
         self.accessRef = ref;
 
         // We need to create a serial queue.
@@ -194,9 +194,9 @@ static void TMAccessCallback(SCNetworkReachabilityRef target, SCNetworkReachabil
         self.accessRef = nil;
     }
 
-	self.reachableBlock          = nil;
-    self.unreachableBlock        = nil;
-    self.accessBlock       = nil;
+	self.accessableBlock          = nil;
+    self.unaccessableBlock        = nil;
+    self.accessibilityBlock       = nil;
     self.accessSerialQueue = nil;
 }
 
@@ -274,7 +274,7 @@ static void TMAccessCallback(SCNetworkReachabilityRef target, SCNetworkReachabil
 
 #define testcase (kSCNetworkReachabilityFlagsConnectionRequired | kSCNetworkReachabilityFlagsTransientConnection)
 
--(BOOL)isReachableWithFlags:(SCNetworkReachabilityFlags)flags
+-(BOOL)isAccessableWithFlags:(SCNetworkReachabilityFlags)flags
 {
     BOOL connectionUP = YES;
     
@@ -288,7 +288,7 @@ static void TMAccessCallback(SCNetworkReachabilityRef target, SCNetworkReachabil
     if(flags & kSCNetworkReachabilityFlagsIsWWAN)
     {
         // We're on 3G.
-        if(!self.reachableOnWWAN)
+        if(!self.accessableOnWWAN)
         {
             // We don't want to connect when on 3G.
             connectionUP = NO;
@@ -306,10 +306,10 @@ static void TMAccessCallback(SCNetworkReachabilityRef target, SCNetworkReachabil
     if(!SCNetworkReachabilityGetFlags(self.accessRef, &flags))
         return NO;
     
-    return [self isReachableWithFlags:flags];
+    return [self isAccessableWithFlags:flags];
 }
 
--(BOOL)isReachableViaWWAN 
+-(BOOL)isAccessableViaWWAN
 {
 #if	TARGET_OS_IPHONE
 
@@ -332,7 +332,7 @@ static void TMAccessCallback(SCNetworkReachabilityRef target, SCNetworkReachabil
     return NO;
 }
 
--(BOOL)isReachableViaWiFi 
+-(BOOL)isAccessableViaWiFi
 {
     SCNetworkReachabilityFlags flags = 0;
     
@@ -408,17 +408,17 @@ static void TMAccessCallback(SCNetworkReachabilityRef target, SCNetworkReachabil
 
 -(NetworkStatus)currentAccessStatus
 {
-    if([self isReachable])
+    if([self isAccessable])
     {
-        if([self isReachableViaWiFi])
-            return ReachableViaWiFi;
+        if([self isAccessableViaWiFi])
+            return AccessableViaWiFi;
         
 #if	TARGET_OS_IPHONE
-        return ReachableViaWWAN;
+        return AccessableViaWWAN;
 #endif
     }
     
-    return NotReachable;
+    return NotAccessable;
 }
 
 -(SCNetworkReachabilityFlags) accessFlags
@@ -437,12 +437,12 @@ static void TMAccessCallback(SCNetworkReachabilityRef target, SCNetworkReachabil
 {
 	NetworkStatus temp = [self currentAccessStatus];
 	
-	if(temp == ReachableViaWWAN)
+	if(temp == AccessableViaWWAN)
 	{
         // Updated for the fact that we have CDMA phones now!
 		return NSLocalizedString(@"Cellular", @"");
 	}
-	if (temp == ReachableViaWiFi) 
+	if (temp == AccessableViaWiFi)
 	{
 		return NSLocalizedString(@"WiFi", @"");
 	}
@@ -452,31 +452,31 @@ static void TMAccessCallback(SCNetworkReachabilityRef target, SCNetworkReachabil
 
 -(NSString*)currentAccessFlags
 {
-    return AccessFlags([self accessFlags]);
+    return accessFlags([self accessFlags]);
 }
 
 #pragma mark - Callback function calls this method
 
 -(void)accessChanged:(SCNetworkReachabilityFlags)flags
 {
-    if([self isReachableWithFlags:flags])
+    if([self isAccessableWithFlags:flags])
     {
-        if(self.reachableBlock)
+        if(self.accessableBlock)
         {
-            self.reachableBlock(self);
+            self.accessableBlock(self);
         }
     }
     else
     {
-        if(self.unreachableBlock)
+        if(self.unaccessableBlock)
         {
-            self.unreachableBlock(self);
+            self.unaccessableBlock(self);
         }
     }
     
-    if(self.accessBlock)
+    if(self.accessibilityBlock)
     {
-        self.accessBlock(self, flags);
+        self.accessibilityBlock(self, flags);
     }
     
     // this makes sure the change notification happens on the MAIN THREAD

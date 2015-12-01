@@ -55,21 +55,20 @@ typedef NS_ENUM(NSInteger, NetworkStatus) {
 @class Access;
 
 typedef void (^NetworkAccessable)(Access * Access);
-typedef void (^NetworkUnAccessable)(Access * Access);
+typedef void (^NetworkUnaccessable)(Access * Access);
 typedef void (^NetworkAccessibility)(Access * Access, SCNetworkConnectionFlags flags);
 
 
 @interface Access : NSObject
 
 @property (nonatomic, copy) NetworkAccessable    accessableBlock;
-@property (nonatomic, copy) NetworkUnaccessable  unAccessableBlock;
+@property (nonatomic, copy) NetworkUnaccessable  unaccessableBlock;
 @property (nonatomic, copy) NetworkAccessibility accessibilityBlock;
 
 @property (nonatomic, assign) BOOL accessableOnWWAN;
 
 
 +(bool) hasInternetConnection;
-+(instancetype)AccessWithHostname:(NSString*)hostname;
 // This is identical to the function above, but is here to maintain
 //compatibility with Apples original code. (see .m)
 +(instancetype)accessWithHostName:(NSString*)hostname;
@@ -77,7 +76,7 @@ typedef void (^NetworkAccessibility)(Access * Access, SCNetworkConnectionFlags f
 +(instancetype)accessWithAddress:(void *)hostAddress;
 +(instancetype)accessForLocalWiFi;
 
--(instancetype)initWithReachabilityRef:(SCNetworkReachabilityRef)ref;
+-(instancetype)initWithAccessRef:(SCNetworkReachabilityRef)ref;
 
 -(BOOL)startNotifier;
 -(void)stopNotifier;
@@ -96,7 +95,7 @@ typedef void (^NetworkAccessibility)(Access * Access, SCNetworkConnectionFlags f
 -(BOOL)isInterventionRequired;
 
 -(NetworkStatus)currentAccessStatus;
--(SCNetworkAccessFlags)accessFlags;
+-(SCNetworkReachabilityFlags)accessFlags;
 -(NSString*)currentAccessString;
 -(NSString*)currentAccessFlags;
 
