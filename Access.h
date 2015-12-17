@@ -24,29 +24,26 @@
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE. 
  */
+ 
+ 
+#ifndef __ACCESS_H
+#define __ACCESS_H
+
 
 #import <Foundation/Foundation.h>
 #import <SystemConfiguration/SystemConfiguration.h>
 
-//! Project version number for MacOSAccess.
+/** Project version number */
 FOUNDATION_EXPORT double AccessVersionNumber;
 
-//! Project version string for MacOSAccess.
+/** Project version string */
 FOUNDATION_EXPORT const unsigned char AccessVersionString[];
 
-/** 
- * Create NS_ENUM macro if it does not exist on the targeted version of iOS or OS X.
- *
- * @see http://nshipster.com/ns_enum-ns_options/
- **/
-#ifndef NS_ENUM
-#define NS_ENUM(_type, _name) enum _name : _type _name; enum _name : _type
-#endif
 
 extern NSString *const kAccessChangedNotification;
 
+/* Apple NetworkStatus Compatible Names. */
 typedef NS_ENUM(NSInteger, NetworkStatus) {
-    // Apple NetworkStatus Compatible Names.
     NotAccessable = 0,
     AccessableViaWiFi = 2,
     AccessableViaWWAN = 1
@@ -69,34 +66,35 @@ typedef void (^NetworkAccessibility)(Access * Access, SCNetworkConnectionFlags f
 
 
 +(bool) hasInternetConnection;
-// This is identical to the function above, but is here to maintain
-//compatibility with Apples original code. (see .m)
-+(instancetype)accessWithHostName:(NSString*)hostname;
-+(instancetype)accessForInternetConnection;
-+(instancetype)accessWithAddress:(void *)hostAddress;
-+(instancetype)accessForLocalWiFi;
+/* This is identical to the function above, but is here to maintain
+ compatibility with Apples original code. (see .m) */
++(instancetype) accessWithHostName:(NSString*)hostname;
++(instancetype) accessForInternetConnection;
++(instancetype) accessWithAddress:(void *)hostAddress;
++(instancetype) accessForLocalWiFi;
 
--(instancetype)initWithAccessRef:(SCNetworkReachabilityRef)ref;
+-(instancetype) initWithAccessRef:(SCNetworkReachabilityRef)ref;
 
--(BOOL)startNotifier;
--(void)stopNotifier;
+-(BOOL) startNotifier;
+-(void) stopNotifier;
 
--(BOOL)isAccessable;
--(BOOL)isAccessableViaWWAN;
--(BOOL)isAccessableViaWiFi;
+-(BOOL) isAccessable;
+-(BOOL) isAccessableViaWWAN;
+-(BOOL) isAccessableViaWiFi;
 
-// WWAN may be available, but not active until a connection has been established.
-// WiFi may require a connection for VPN on Demand.
--(BOOL)isConnectionRequired; // Identical DDG variant.
--(BOOL)connectionRequired; // Apple's routine.
-// Dynamic, on demand connection?
--(BOOL)isConnectionOnDemand;
-// Is user intervention required?
--(BOOL)isInterventionRequired;
+/* WWAN may be available, but not active until a connection has been established.
+   WiFi may require a connection for VPN on Demand. */
+-(BOOL) isConnectionRequired; /* Identical DDG variant. */
+-(BOOL) connectionRequired; /* Apple's routine. */
+-(BOOL) isConnectionOnDemand; /* Dynamic, on demand connection? */
+-(BOOL) isInterventionRequired; /* Is user intervention required? */
 
--(NetworkStatus)currentAccessStatus;
--(SCNetworkReachabilityFlags)accessFlags;
--(NSString*)currentAccessString;
--(NSString*)currentAccessFlags;
+-(NetworkStatus) currentAccessStatus;
+-(SCNetworkReachabilityFlags) accessFlags;
+-(NSString*) currentAccessString;
+-(NSString*) currentAccessFlags;
 
 @end
+
+
+#endif /* __ACCESS_H */
