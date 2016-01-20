@@ -101,11 +101,9 @@ static void TMAccessCallback(SCNetworkReachabilityRef target, SCNetworkReachabil
     
     if (ref)
     {
-        Access *obj = [[self alloc] initWithAccessRef:ref];
+        Access *obj = [[Access alloc] initWithAccessRef:ref];
         
         hasConnection = obj.isAccessable;
-        
-        CFRelease(ref);
     }
     
     return hasConnection;
